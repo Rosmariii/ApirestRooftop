@@ -1,10 +1,37 @@
 const express = require("express")
 const app = express()
 const dotenv = require("dotenv")
+const jwt = require('jsonwebtoken');
 
 dotenv.config()
 
-function isAdmin(req, res, next) {
+const accessTokenSecret="65a83e72c7e990a3e6565ae8b7cc071c";
+
+const authenticateJWT = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader) {
+        const token = authHeader.split(' ')[1];
+
+        console.log(authHeader)
+        jwt.verify(token, accessTokenSecret, (err, user) => {
+            if (err) {
+                return res.sendStatus(403);
+            }
+
+            req.user = user;
+            next();
+        });
+    } else {
+        res.sendStatus(401);
+    }
+};
+
+app.get('/', authenticateJWT, (req, res) => {
+    res.send('holamundo');
+});
+
+/*function isAdmin(req, res, next) {
     if (req.body.isAdmin) {
       next();
     } else {
@@ -20,8 +47,8 @@ function isAdmin(req, res, next) {
   
   app.get('/dashboard', (req, res) => {
     res.send('You are an admin');
-  });
+  });*/
   
 
 
-app.listen(process.env.PORT)
+app.listen(5000)
