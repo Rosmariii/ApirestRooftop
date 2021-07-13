@@ -1,7 +1,6 @@
 const express = require("express")
 const app = express()
 const dotenv = require("dotenv")
-const jwt = require('jsonwebtoken');
 
 dotenv.config()
 
@@ -13,17 +12,14 @@ const authenticateJWT = (req, res, next) => {
     if (authHeader) {
         const token = authHeader.split(' ')[1];
 
-        console.log(authHeader)
-        jwt.verify(token, accessTokenSecret, (err, user) => {
-            if (err) {
-                return res.sendStatus(403);
-            }
-
-            req.user = user;
-            next();
-        });
+        if (token == accessTokenSecret) {
+            return res.sendStatus(200).json({message:"authorized"})
+        } else {
+            return res.sendStatus(403).json({message:"unauthorized"})
+        }
+       
     } else {
-        res.sendStatus(401);
+        res.sendStatus(404).json({message:"error"});
     }
 };
 
@@ -31,24 +27,5 @@ app.get('/', authenticateJWT, (req, res) => {
     res.send('holamundo');
 });
 
-/*function isAdmin(req, res, next) {
-    if (req.body.isAdmin) {
-      next();
-    } else {
-      res.status(403).send(`Sorry but you are not an admin and you do not have access to route ${req.url}`);
-    }
-  }
-  
 
-  app.use(express.json());
-  
-
-  app.use(isAdmin);
-  
-  app.get('/dashboard', (req, res) => {
-    res.send('You are an admin');
-  });*/
-  
-
-
-app.listen(5000)
+app.listen(process.env.PORT)
