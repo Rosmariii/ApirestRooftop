@@ -3,9 +3,6 @@ const app = express()
 const dotenv = require("dotenv")
 
 dotenv.config()
-app.use(express.json());
-app.use(isAdmin);
-
 
 function isAdmin(req, res, next) {
     if (req.body.isAdmin) {
@@ -15,9 +12,16 @@ function isAdmin(req, res, next) {
     }
   }
   
+
+  app.use(express.json());
+  
+
+  app.use(isAdmin);
+  
   app.get('/dashboard', (req, res) => {
     res.send('You are an admin');
   });
   
+
 
 app.listen(process.env.PORT)
