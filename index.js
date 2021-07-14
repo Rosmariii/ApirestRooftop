@@ -1,6 +1,7 @@
 const express = require("express")
 const app = express()
 const dotenv = require("dotenv")
+var audit = require('express-requests-logger')
 
 dotenv.config()
 
@@ -15,17 +16,20 @@ const authenticateJWT = (req, res, next) => {
         if (token == accessTokenSecret) {
             return res.sendStatus(200).json({message:"authorized"})
         } else {
+
             return res.sendStatus(403).json({message:"unauthorized"})
         }
-       
     } else {
         res.sendStatus(404).json({message:"error"});
-    }
+    } next()
 };
 
 app.get('/', authenticateJWT, (req, res) => {
     res.send('holamundo');
 });
+
+app.use(audit({
+    logger: logger,
 
 
 app.listen(process.env.PORT)
